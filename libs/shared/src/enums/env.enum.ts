@@ -3,4 +3,6 @@ export enum EnvParams {
   PORT = 'PORT',
   SQLITE_DB = 'SQLITE_DB',
   CLIENT_URL = 'CLIENT_URL',
+  JWT_SECRET = 'JWT_SECRET',
+  JWT_EXPIRES_IN = 'JWT_EXPIRES_IN',
 }
