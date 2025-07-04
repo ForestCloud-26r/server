@@ -8,9 +8,10 @@ import { SignupResponseDto } from './dto/signup-response.dto';
 import { UsersService } from '../users/users.service';
 import { UserRoles } from '@app/shared/enums';
 import { JwtService } from '@nestjs/jwt';
-import { UserDto } from '@app/shared/dtos';
+import { UserDto, UserPayloadDto } from '@app/shared/dtos';
 import * as bcrypt from 'bcrypt';
 import { toUserDto } from '@app/shared/utils';
+import { SigninResponseDto } from './dto/signin-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +37,7 @@ export class AuthService {
     return { auth_token: authToken, user: createdUser };
   }
 
-  public async signin(userDto: UserDto): Promise<SignupResponseDto> {
+  public async signin(userDto: UserPayloadDto): Promise<SigninResponseDto> {
     const authToken = await this.jwtService.signAsync({ ...userDto });
 
     return { auth_token: authToken, user: userDto };
@@ -49,7 +50,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const pwMatch = await bcrypt.compare(password, user.get('password'));
+    const pwMatch = await bcrypt.compare(password, user.password);
 
     if (!pwMatch) {
       throw new UnauthorizedException();

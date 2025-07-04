@@ -1,11 +1,12 @@
 import { Body, Controller, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RejectResponseDto, UserDto } from '@app/shared/dtos';
+import { RejectResponseDto, UserPayloadDto } from '@app/shared/dtos';
 import { SignupResponseDto } from './dto/signup-response.dto';
 import { SignupBodyDto } from './dto/signup-body.dto';
 import { LocalGuard } from '@app/shared/guards';
 import { User } from '@app/shared/decorators';
+import { SigninResponseDto } from './dto/signin-response.dto';
 
 @ApiTags('Authorization')
 @ApiResponse({
@@ -30,7 +31,9 @@ export class AuthController {
   @UseGuards(LocalGuard)
   @ApiOperation({ summary: 'Log into as user or administrator' })
   @ApiResponse({ status: HttpStatus.OK, type: SignupResponseDto })
-  public async signin(@User() userDto: UserDto): Promise<SignupResponseDto> {
+  public async signin(
+    @User() userDto: UserPayloadDto,
+  ): Promise<SigninResponseDto> {
     return this.authService.signin(userDto);
   }
 }

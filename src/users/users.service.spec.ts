@@ -5,7 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from '../database/models/user.model';
 import { Sequelize } from 'sequelize-typescript';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserRoles } from '@app/shared/enums';
+import { UserRoles } from '../../libs/shared/src/enums';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -89,12 +89,11 @@ describe('UsersService', () => {
     };
 
     const user = await service.getUserByEmail('test@email.com');
-    const plainUser = user?.get({ plain: true });
 
     expect(user).toBeDefined();
-    expect(plainUser?.email).toBe(dto.email);
-    expect(plainUser?.fullname).toBe(dto.fullname);
-    expect(plainUser?.role).toBe(UserRoles.USER);
-    expect(plainUser?.password).not.toBe(dto.password);
+    expect(user?.email).toBe(dto.email);
+    expect(user?.fullname).toBe(dto.fullname);
+    expect(user?.role).toBe(UserRoles.USER);
+    expect(user?.password).not.toBe(dto.password);
   });
 });

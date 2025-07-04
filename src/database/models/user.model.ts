@@ -23,23 +23,23 @@ export interface UserCreationAttributes {
 export class UserModel extends Model<UserModel, UserCreationAttributes> {
   @PrimaryKey
   @Column
-  userId!: string;
+  declare userId: string;
 
   @Column
-  fullname!: string;
+  declare fullname: string;
 
   @Unique
   @Column
-  email!: string;
+  declare email: string;
 
   @Column
-  password!: string;
+  declare password: string;
 
   @Default(UserRoles.USER)
   @Column({
     type: DataType.ENUM(...Object.values(UserRoles)),
   })
-  role!: UserRoles;
+  declare role: UserRoles;
 
   @CreatedAt
   @Column
