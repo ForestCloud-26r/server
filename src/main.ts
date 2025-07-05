@@ -23,6 +23,7 @@ async function bootstrap() {
   const documentConfig = new DocumentBuilder()
     .setTitle('Forest API')
     .setVersion('1.0.0')
+    .addServer('api/v1')
     .addBearerAuth()
     .build();
 
