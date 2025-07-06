@@ -20,7 +20,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prepare": "husky"
+    "prepare": "husky",
+    "migrate": "sequelize migration:generate --name",
+    "migrate:status": "sequelize db:migrate:status",
+    "migrate:up": "sequelize db:migrate",
+    "migrate:down": "sequelize db:migrate:undo",
+    "migrate:revert": "sequelize db:migrate:undo:all"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

@@ -13,4 +13,10 @@ export class UsersRepository extends AbstractRepository<UserModel> {
       idField: 'userId',
     });
   }
+
+  public async giveAccess(userId: string): Promise<UserModel | null> {
+    return this.updateByPk(userId, {
+      hasAccess: true,
+    });
+  }
 }

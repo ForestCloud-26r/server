@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignupBodyDto } from './dto/signup-body.dto';
 import { SignupResponseDto } from './dto/signup-response.dto';
 import { UsersService } from '../users/users.service';
@@ -12,6 +8,7 @@ import { UserDto, UserPayloadDto } from '@app/shared/dtos';
 import * as bcrypt from 'bcrypt';
 import { toUserDto } from '@app/shared/utils';
 import { SigninResponseDto } from './dto/signin-response.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,13 +20,17 @@ export class AuthService {
   public async signup(signupDto: SignupBodyDto): Promise<SignupResponseDto> {
     const foundAdmin = await this.usersService.findAllAdmins();
 
-    if (foundAdmin.length) {
-      throw new ForbiddenException();
+    const createUserDto: CreateUserDto = {
+      ...signupDto,
+    };
+
+    if (!foundAdmin.length) {
+      createUserDto.role = UserRoles.ADMIN;
+      createUserDto.hasAccess = true;
     }
 
     const createdUser = await this.usersService.createUser({
-      ...signupDto,
-      role: UserRoles.ADMIN,
+      ...createUserDto,
     });
 
     const authToken = await this.jwtService.signAsync({ ...createdUser });

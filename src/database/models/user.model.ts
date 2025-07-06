@@ -1,4 +1,5 @@
 import {
+  AllowNull,
   Column,
   CreatedAt,
   DataType,
@@ -17,6 +18,7 @@ export interface UserCreationAttributes {
   email: string;
   password: string;
   role?: UserRoles;
+  hasAccess?: boolean;
 }
 
 @Table({ tableName: 'users', timestamps: true, paranoid: true })
@@ -40,6 +42,11 @@ export class UserModel extends Model<UserModel, UserCreationAttributes> {
     type: DataType.ENUM(...Object.values(UserRoles)),
   })
   declare role: UserRoles;
+
+  @AllowNull
+  @Default(false)
+  @Column
+  declare hasAccess: boolean;
 
   @CreatedAt
   @Column

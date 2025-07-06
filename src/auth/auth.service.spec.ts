@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersRepository } from '../users/users.repository';
 import { SignupBodyDto } from './dto/signup-body.dto';
 import { UserRoles } from '@app/shared/enums';
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { UserPayloadDto } from '@app/shared/dtos';
 
 describe('UsersService', () => {
@@ -68,17 +68,19 @@ describe('UsersService', () => {
       expect(result.auth_token).toBeDefined();
       expect(result.user.email).toBe(signupDto.email);
       expect(result.user.role).toBe(UserRoles.ADMIN);
+      expect(result.user.hasAccess).toBeTruthy();
 
       const users = await usersService.findAllAdmins();
       expect(users.length).toBe(1);
     });
 
-    it('should throw if admin already exists', async () => {
+    it('should create user without access if admin already exists', async () => {
       await usersService.createUser({
         fullname: 'Some name',
         email: 'admin@exists.com',
         password: '123456',
         role: UserRoles.ADMIN,
+        hasAccess: true,
       });
 
       const dto: SignupBodyDto = {
@@ -87,7 +89,10 @@ describe('UsersService', () => {
         password: 'newpass',
       };
 
-      await expect(authService.signup(dto)).rejects.toThrow(ForbiddenException);
+      const { user } = await authService.signup(dto);
+
+      expect(user.role).toBe(UserRoles.USER);
+      expect(user.hasAccess).toBeFalsy();
     });
   });
 
@@ -105,6 +110,7 @@ describe('UsersService', () => {
         userId: user.userId,
         email: user.email,
         role: user.role,
+        hasAccess: user.hasAccess,
       };
 
       const result = await authService.signin(payload);

@@ -18,4 +18,8 @@ export class UserPayloadDto {
   @Expose()
   @ApiProperty({ enum: UserRoles, example: UserRoles.ADMIN })
   role!: UserRoles;
+
+  @Expose()
+  @ApiProperty({ example: true })
+  hasAccess!: boolean;
 }
