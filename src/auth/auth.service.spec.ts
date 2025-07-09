@@ -25,6 +25,7 @@ describe('UsersService', () => {
           storage: ':memory:',
           autoLoadModels: true,
           sync: { force: true },
+          logging: false,
         }),
         SequelizeModule.forFeature([UserModel]),
         JwtModule.register({
@@ -67,10 +68,10 @@ describe('UsersService', () => {
 
       expect(result.auth_token).toBeDefined();
       expect(result.user.email).toBe(signupDto.email);
-      expect(result.user.role).toBe(UserRoles.ADMIN);
+      expect(result.user.role).toBe(UserRoles.OWNER);
       expect(result.user.hasAccess).toBeTruthy();
 
-      const users = await usersService.findAllAdmins();
+      const users = await usersService.findAll();
       expect(users.length).toBe(1);
     });
 

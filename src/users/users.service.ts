@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { UserDto } from '@app/shared/dtos';
 import { CreateUserDto } from './dto/create-user.dto';
 import { toUserDto } from '@app/shared/utils';
-import { UserRoles } from '@app/shared/enums';
 import { UserModel } from '../database/models/user.model';
 import * as bcrypt from 'bcrypt';
+import { ChangeUserInfoBodyDto } from './dto/change-user-info-body.dto';
+import { ChangeUserPasswordBodyDto } from './dto/change-user-password-body.dto';
 
 @Injectable()
 export class UsersService {
@@ -22,10 +23,8 @@ export class UsersService {
     return toUserDto(createdUser);
   }
 
-  public async findAllAdmins(): Promise<UserDto[]> {
-    const users = await this.usersRepository.findAll({
-      role: UserRoles.ADMIN,
-    });
+  public async findAll(): Promise<UserDto[]> {
+    const users = await this.usersRepository.findAll({});
 
     return users.map((user) => toUserDto(user));
   }
@@ -34,6 +33,41 @@ export class UsersService {
     return await this.usersRepository.findOne({
       email,
     });
+  }
+
+  public async changeUserInfo(
+    userId: string,
+    updateDto: ChangeUserInfoBodyDto,
+  ): Promise<UserDto> {
+    const updatedUser = await this.usersRepository.updateByPk(
+      userId,
+      updateDto,
+    );
+
+    return toUserDto(updatedUser!);
+  }
+
+  public async changePassword(
+    userId: string,
+    changeUserPasswordDto: ChangeUserPasswordBodyDto,
+  ): Promise<UserDto> {
+    const { oldPassword, newPassword } = changeUserPasswordDto;
+    const user = await this.usersRepository.findByPk(userId);
+
+    const pwMatch = await bcrypt.compare(oldPassword, user!.password);
+
+    if (!pwMatch) {
+      throw new ForbiddenException('Old password is incorrect');
+    }
+
+    const newPasswordHash = await this.generateHash(newPassword);
+
+    const updatedUser = await this.usersRepository.updateByPk(userId, {
+      password: newPasswordHash,
+      mustChangePassword: false,
+    });
+
+    return toUserDto(updatedUser!);
   }
 
   private async generateHash(data: string): Promise<string> {

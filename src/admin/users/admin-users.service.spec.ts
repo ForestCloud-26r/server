@@ -3,13 +3,13 @@ import { AdminUsersService } from './admin-users.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from '../../database/models/user.model';
 import { Sequelize } from 'sequelize-typescript';
-import { UsersRepository } from '../../users/users.repository';
 import { UserRoles } from '@app/shared/enums';
 import { NotFoundException } from '@nestjs/common';
+import { AdminUserRepository } from './admin-user.repository';
 
 describe('UsersService', () => {
   let service: AdminUsersService;
-  let repository: UsersRepository;
+  let repository: AdminUserRepository;
   let sequelize: Sequelize;
 
   beforeAll(async () => {
@@ -24,11 +24,11 @@ describe('UsersService', () => {
         }),
         SequelizeModule.forFeature([UserModel]),
       ],
-      providers: [AdminUsersService, UsersRepository],
+      providers: [AdminUsersService, AdminUserRepository],
       exports: [SequelizeModule],
     }).compile();
 
-    repository = module.get<UsersRepository>(UsersRepository);
+    repository = module.get<AdminUserRepository>(AdminUserRepository);
     service = module.get<AdminUsersService>(AdminUsersService);
     sequelize = module.get<Sequelize>(Sequelize);
   });

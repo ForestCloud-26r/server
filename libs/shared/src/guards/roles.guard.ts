@@ -18,7 +18,7 @@ export class RoleGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
-    if (!allowedRoles || userRole === UserRoles.ADMIN) {
+    if (!allowedRoles || userRole === UserRoles.OWNER) {
       return true;
     }
 

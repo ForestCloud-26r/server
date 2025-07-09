@@ -5,7 +5,11 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from '../database/models/user.model';
 import { Sequelize } from 'sequelize-typescript';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserRoles } from '../../libs/shared/src/enums';
+import { UserRoles } from '@app/shared/enums';
+import { ForbiddenException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { UserDto } from '@app/shared/dtos';
+import { afterEach } from 'node:test';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -21,6 +25,7 @@ describe('UsersService', () => {
           storage: ':memory:',
           autoLoadModels: true,
           sync: { force: true },
+          logging: false,
         }),
         SequelizeModule.forFeature([UserModel]),
       ],
@@ -30,6 +35,10 @@ describe('UsersService', () => {
     service = module.get<UsersService>(UsersService);
     repository = module.get<UsersRepository>(UsersRepository);
     sequelize = module.get<Sequelize>(Sequelize);
+  });
+
+  afterEach(async () => {
+    await UserModel.truncate();
   });
 
   afterAll(async () => {
@@ -59,7 +68,7 @@ describe('UsersService', () => {
     expect(userInDb?.password).not.toBe(dto.password);
   });
 
-  it('Should find all admins', async () => {
+  it('Should find all users', async () => {
     const dto: CreateUserDto = {
       email: 'admin@email.com',
       fullname: 'name',
@@ -68,7 +77,7 @@ describe('UsersService', () => {
     };
 
     const createdUser = await service.createUser(dto);
-    const [admin] = await service.findAllAdmins();
+    const [, admin] = await service.findAll();
 
     expect(createdUser).toBeDefined();
     expect(createdUser.email).toBe(dto.email);
@@ -95,5 +104,71 @@ describe('UsersService', () => {
     expect(user?.fullname).toBe(dto.fullname);
     expect(user?.role).toBe(UserRoles.USER);
     expect(user?.password).not.toBe(dto.password);
+  });
+
+  it('should change user info', async () => {
+    const dto: CreateUserDto = {
+      email: 'test1@email.com',
+      fullname: 'name',
+      password: 'password',
+    };
+
+    const createdUser = await service.createUser(dto);
+
+    const updatedUser = await service.changeUserInfo(createdUser.userId, {
+      email: 'updated@email.com',
+    });
+
+    expect(updatedUser.email).not.toBe(createdUser.email);
+    expect(updatedUser.fullname).toBe(createdUser.fullname);
+  });
+
+  describe('update user password', () => {
+    const dto: CreateUserDto = {
+      email: 'test2@email.com',
+      fullname: 'name',
+      password: 'password',
+    };
+
+    let createdUser: UserDto;
+
+    beforeAll(async () => {
+      createdUser = await service.createUser(dto);
+      createdUser = (await repository.updateByPk(createdUser.userId, {
+        mustChangePassword: true,
+      })) as UserModel;
+    });
+
+    afterAll(async () => {
+      await UserModel.truncate();
+    });
+
+    it('should throw on different passwords with original', async () => {
+      await expect(
+        service.changePassword(createdUser.userId, {
+          newPassword: 'somepass',
+          oldPassword: 'wrongpass',
+        }),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should update password', async () => {
+      await service.changePassword(createdUser.userId, {
+        newPassword: 'newpass',
+        oldPassword: 'password',
+      });
+
+      const updatedUser = await service.getUserByEmail('test2@email.com');
+
+      const pwMatch = await bcrypt.compare('newpass', updatedUser!.password);
+
+      expect(pwMatch).toBeTruthy();
+
+      await expect(
+        bcrypt.compare('newpass', updatedUser!.password),
+      ).resolves.toBeTruthy();
+
+      expect(updatedUser?.mustChangePassword).toBeFalsy();
+    });
   });
 });

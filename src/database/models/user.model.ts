@@ -19,6 +19,7 @@ export interface UserCreationAttributes {
   password: string;
   role?: UserRoles;
   hasAccess?: boolean;
+  mustChangePassword?: boolean;
 }
 
 @Table({ tableName: 'users', timestamps: true, paranoid: true })
@@ -47,6 +48,11 @@ export class UserModel extends Model<UserModel, UserCreationAttributes> {
   @Default(false)
   @Column
   declare hasAccess: boolean;
+
+  @AllowNull
+  @Default(false)
+  @Column
+  declare mustChangePassword: boolean;
 
   @CreatedAt
   @Column

@@ -1,7 +1,14 @@
-import { Controller, Get, HttpStatus, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '@app/shared/decorators';
-import { RejectResponseDto, UserPayloadDto } from '@app/shared/dtos';
+import { RejectResponseDto, UserDto, UserPayloadDto } from '@app/shared/dtos';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -9,6 +16,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtGuard } from '@app/shared/guards';
+import { ChangeUserInfoBodyDto } from './dto/change-user-info-body.dto';
+import { ChangeUserPasswordBodyDto } from './dto/change-user-password-body.dto';
 
 @ApiTags('Users')
 @ApiResponse({
@@ -25,7 +34,7 @@ import { JwtGuard } from '@app/shared/guards';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('me')
+  @Get('profile')
   @ApiOperation({ summary: 'Get current logged in user' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -35,5 +44,35 @@ export class UsersController {
     @User() userDto: UserPayloadDto,
   ): Promise<UserPayloadDto> {
     return Promise.resolve(userDto);
+  }
+
+  @Put('update-info')
+  @ApiOperation({ summary: 'Change users fullname or email' })
+  @ApiResponse({
+    status: 200,
+    type: UserPayloadDto,
+  })
+  public async changeUserInfo(
+    @User('userId') userId: string,
+    @Param() updateDto: ChangeUserInfoBodyDto,
+  ): Promise<UserDto> {
+    return this.usersService.changeUserInfo(userId, updateDto);
+  }
+
+  @Put('password')
+  @ApiOperation({ summary: 'Change users password' })
+  @ApiResponse({
+    status: 200,
+    type: UserDto,
+  })
+  @ApiResponse({
+    status: 403,
+    type: RejectResponseDto,
+  })
+  public async changeUserPassword(
+    @User('userId') userId: string,
+    @Param() changePasswordDto: ChangeUserPasswordBodyDto,
+  ): Promise<UserDto> {
+    return this.usersService.changePassword(userId, changePasswordDto);
   }
 }

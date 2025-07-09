@@ -18,14 +18,14 @@ export class AuthService {
   ) {}
 
   public async signup(signupDto: SignupBodyDto): Promise<SignupResponseDto> {
-    const foundAdmin = await this.usersService.findAllAdmins();
+    const users = await this.usersService.findAll();
 
     const createUserDto: CreateUserDto = {
       ...signupDto,
     };
 
-    if (!foundAdmin.length) {
-      createUserDto.role = UserRoles.ADMIN;
+    if (!users.length) {
+      createUserDto.role = UserRoles.OWNER;
       createUserDto.hasAccess = true;
     }
 
@@ -39,9 +39,21 @@ export class AuthService {
   }
 
   public async signin(userDto: UserPayloadDto): Promise<SigninResponseDto> {
-    const authToken = await this.jwtService.signAsync({ ...userDto });
+    let message = 'Logged in successfully';
 
-    return { auth_token: authToken, user: userDto };
+    const authToken = await this.jwtService.signAsync({ ...userDto });
+    const user = await this.usersService.getUserByEmail(userDto.email);
+
+    if (user?.mustChangePassword) {
+      message = 'Temporary password used. Please change your password';
+    }
+
+    return {
+      auth_token: authToken,
+      user: userDto,
+      message,
+      temporaryPasswordUsed: user?.mustChangePassword,
+    };
   }
 
   public async validateUser(email: string, password: string): Promise<UserDto> {
