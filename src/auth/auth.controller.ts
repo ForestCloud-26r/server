@@ -34,7 +34,7 @@ export class AuthController {
     type: SigninBodyDto,
   })
   @ApiOperation({ summary: 'Log into as user or administrator' })
-  @ApiResponse({ status: HttpStatus.OK, type: SignupResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: SigninResponseDto })
   public async signin(
     @User() userDto: UserPayloadDto,
   ): Promise<SigninResponseDto> {

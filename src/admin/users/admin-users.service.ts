@@ -26,13 +26,24 @@ export class AdminUsersService {
   }
 
   public async addNewUser(newUserDto: AddNewUserBodyDto): Promise<UserDto> {
-    const hashedPassword = await generateHash(newUserDto.password);
+    const {
+      fullname,
+      email,
+      password,
+      role,
+      hasAccess = true,
+      mustChangePassword = true,
+    } = newUserDto;
+
+    const hashedPassword = await generateHash(password);
 
     const newUser = await this.usersRepository.create({
-      mustChangePassword: true,
-      hasAccess: true,
-      ...newUserDto,
+      fullname,
+      email,
       password: hashedPassword,
+      role,
+      hasAccess,
+      mustChangePassword,
     });
 
     return toUserDto(newUser);
