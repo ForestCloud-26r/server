@@ -3,9 +3,10 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRoles } from '@app/shared/enums';
 
 export class AddNewUserBodyDto {
@@ -33,11 +34,13 @@ export class AddNewUserBodyDto {
 
   @IsBoolean()
   @IsNotEmpty()
-  @ApiProperty({ example: true })
-  hasAccess!: boolean;
+  @IsOptional()
+  @ApiPropertyOptional({ example: false, default: true })
+  hasAccess?: boolean;
 
   @IsBoolean()
   @IsNotEmpty()
-  @ApiProperty({ example: true })
-  mustChangePassword!: boolean;
+  @IsOptional()
+  @ApiPropertyOptional({ example: false, default: true })
+  mustChangePassword?: boolean;
 }

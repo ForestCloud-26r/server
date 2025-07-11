@@ -2,18 +2,19 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { UserDto } from '@app/shared/dtos';
 import { CreateUserDto } from './dto/create-user.dto';
-import { toUserDto } from '@app/shared/utils';
 import { UserModel } from '../database/models/user.model';
 import * as bcrypt from 'bcrypt';
 import { ChangeUserInfoBodyDto } from './dto/change-user-info-body.dto';
 import { ChangeUserPasswordBodyDto } from './dto/change-user-password-body.dto';
+import { toUserDto } from '@app/shared/builders';
+import { generateHash } from '@app/shared/utils';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   public async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
-    const passwordHash = await this.generateHash(createUserDto.password);
+    const passwordHash = await generateHash(createUserDto.password);
 
     const createdUser = await this.usersRepository.create({
       ...createUserDto,
@@ -60,7 +61,7 @@ export class UsersService {
       throw new ForbiddenException('Old password is incorrect');
     }
 
-    const newPasswordHash = await this.generateHash(newPassword);
+    const newPasswordHash = await generateHash(newPassword);
 
     const updatedUser = await this.usersRepository.updateByPk(userId, {
       password: newPasswordHash,
@@ -68,10 +69,5 @@ export class UsersService {
     });
 
     return toUserDto(updatedUser!);
-  }
-
-  private async generateHash(data: string): Promise<string> {
-    const salt = await bcrypt.genSalt();
-    return await bcrypt.hash(data, salt);
   }
 }

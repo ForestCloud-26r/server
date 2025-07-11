@@ -1,22 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserDto } from '@app/shared/dtos';
-import { toUserDto } from '@app/shared/utils';
+import { toUserDto } from '@app/shared/builders';
 import { AdminUserRepository } from './admin-user.repository';
 import { AddNewUserBodyDto } from './dto/add-new-user-body.dto';
 import { ChangeUserInfoBodyDto } from './dto/change-user-info-body.dto';
-import * as bcrypt from 'bcrypt';
 import { DeleteUserResponseDto } from './dto/delete-user-response.dto';
 import { UserRoles } from '@app/shared/enums';
 import { GetAllUsersResponseDto } from './dto/get-all-users-response.dto';
+import { generateHash } from '@app/shared/utils';
 
 @Injectable()
 export class AdminUsersService {
   constructor(private readonly usersRepository: AdminUserRepository) {}
-
-  private async generateHash(data: string): Promise<string> {
-    const salt = await bcrypt.genSalt();
-    return await bcrypt.hash(data, salt);
-  }
 
   public async giveUserAccess(userId: string): Promise<UserDto> {
     const updatedUser = await this.usersRepository.giveAccess(userId);
@@ -31,9 +26,11 @@ export class AdminUsersService {
   }
 
   public async addNewUser(newUserDto: AddNewUserBodyDto): Promise<UserDto> {
-    const hashedPassword = await this.generateHash(newUserDto.password);
+    const hashedPassword = await generateHash(newUserDto.password);
 
     const newUser = await this.usersRepository.create({
+      mustChangePassword: true,
+      hasAccess: true,
       ...newUserDto,
       password: hashedPassword,
     });
@@ -58,7 +55,7 @@ export class AdminUsersService {
     userId: string,
     newPassword: string,
   ): Promise<UserDto> {
-    const newPasswordHash = await this.generateHash(newPassword);
+    const newPasswordHash = await generateHash(newPassword);
 
     const updatedUser = await this.usersRepository.updateByPk(userId, {
       password: newPasswordHash,
@@ -75,7 +72,7 @@ export class AdminUsersService {
   public async deleteUser(userId: string): Promise<DeleteUserResponseDto> {
     const deleteUser = await this.usersRepository.deleteUser(userId);
 
-    return { userId: deleteUser.userId, deletedAt: deleteUser.deletedAt };
+    return { userId: deleteUser.userId, deletedAt: deleteUser.deletedAt! };
   }
 
   public async changeUserRole(
@@ -95,7 +92,7 @@ export class AdminUsersService {
     return { users: mappedUsers };
   }
 
-  public async getUserById(userId: string) {
+  public async getUserById(userId: string): Promise<UserDto> {
     const user = await this.usersRepository.findByPk(userId);
 
     if (!user) {

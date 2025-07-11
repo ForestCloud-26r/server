@@ -6,7 +6,7 @@ import { UserRoles } from '@app/shared/enums';
 import { JwtService } from '@nestjs/jwt';
 import { UserDto, UserPayloadDto } from '@app/shared/dtos';
 import * as bcrypt from 'bcrypt';
-import { toUserDto } from '@app/shared/utils';
+import { toUserDto } from '@app/shared/builders';
 import { SigninResponseDto } from './dto/signin-response.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 

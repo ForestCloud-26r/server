@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { EnvParams } from '@app/shared/enums';
+import type { EnvParams } from '@app/shared/enums';
 import { v7 as uuidv7 } from 'uuid';
 
 export const configSchema = Joi.object<typeof EnvParams>({

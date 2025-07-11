@@ -1,14 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { UsersRepository } from './users.repository';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from '../database/models/user.model';
 import { Sequelize } from 'sequelize-typescript';
-import { CreateUserDto } from './dto/create-user.dto';
+import type { CreateUserDto } from './dto/create-user.dto';
 import { UserRoles } from '@app/shared/enums';
 import { ForbiddenException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { UserDto } from '@app/shared/dtos';
+import type { UserDto } from '@app/shared/dtos';
 import { afterEach } from 'node:test';
 
 describe('UsersService', () => {

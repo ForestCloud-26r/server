@@ -63,6 +63,6 @@ export class UserModel extends Model<UserModel, UserCreationAttributes> {
   declare updatedAt: Date;
 
   @DeletedAt
-  @Column
-  declare deletedAt: Date;
+  @Column({ type: DataType.DATE })
+  declare deletedAt: Date | null;
 }

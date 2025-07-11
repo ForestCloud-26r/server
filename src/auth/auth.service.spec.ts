@@ -1,15 +1,16 @@
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { Sequelize } from 'sequelize-typescript';
 import { UserModel } from '../database/models/user.model';
 import { UsersService } from '../users/users.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersRepository } from '../users/users.repository';
-import { SignupBodyDto } from './dto/signup-body.dto';
+import type { SignupBodyDto } from './dto/signup-body.dto';
 import { UserRoles } from '@app/shared/enums';
 import { UnauthorizedException } from '@nestjs/common';
-import { UserPayloadDto } from '@app/shared/dtos';
+import type { UserPayloadDto } from '@app/shared/dtos';
 
 describe('UsersService', () => {
   let authService: AuthService;

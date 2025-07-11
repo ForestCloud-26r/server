@@ -2,13 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from 'nestjs-pino';
 import { ConfigService } from '@nestjs/config';
-import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import type { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EnvParams } from '@app/shared/enums';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {
     cors: true,
     bufferLogs: true,

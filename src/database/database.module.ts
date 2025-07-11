@@ -14,7 +14,7 @@ import { UserModel } from './models/user.model';
         models: [UserModel],
         autoLoadModels: true,
         sync: { alter: false, force: false },
-        logging: (msg) => Logger.log(msg, DatabaseModule.name),
+        logging: (msg): void => Logger.log(msg, DatabaseModule.name),
       }),
       inject: [ConfigService],
     }),

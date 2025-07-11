@@ -1,4 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { AdminUsersService } from './admin-users.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from '../../database/models/user.model';

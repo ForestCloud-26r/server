@@ -1,4 +1,5 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import type { ExecutionContext } from '@nestjs/common';
+import { createParamDecorator } from '@nestjs/common';
 import { UserPayloadDto } from '@app/shared/dtos';
 import { plainToInstance } from 'class-transformer';
 import { extractUserFromRequest } from '@app/shared/utils';

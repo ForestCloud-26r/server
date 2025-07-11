@@ -1,7 +1,7 @@
 {
   "development": {
     "dialect": "sqlite",
-    "storage": ".db/forest.sqlite"
+    "storage": ".db/forest.dev.sqlite"
   },
   "test": {
     "dialect": "sqlite",

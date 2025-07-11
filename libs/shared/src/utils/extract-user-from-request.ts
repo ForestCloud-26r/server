@@ -1,4 +1,4 @@
-import { UserPayloadDto } from '@app/shared/dtos';
+import type { UserPayloadDto } from '@app/shared/dtos';
 
 export const extractUserFromRequest = (
   request: Express.Request,

@@ -19,7 +19,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  @ApiOperation({ summary: 'Signup as administrator' })
+  @ApiOperation({ summary: 'Register as user or owner' })
   @ApiResponse({ status: HttpStatus.OK, type: SignupResponseDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: RejectResponseDto })
   public async signup(

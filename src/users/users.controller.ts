@@ -46,7 +46,7 @@ export class UsersController {
     return Promise.resolve(userDto);
   }
 
-  @Put('update-info')
+  @Put('profile')
   @ApiOperation({ summary: 'Change users fullname or email' })
   @ApiResponse({
     status: 200,
