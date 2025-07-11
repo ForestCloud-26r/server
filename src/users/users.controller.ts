@@ -1,8 +1,8 @@
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
-  Param,
   Put,
   UseGuards,
 } from '@nestjs/common';
@@ -54,7 +54,7 @@ export class UsersController {
   })
   public async changeUserInfo(
     @User('userId') userId: string,
-    @Param() updateDto: ChangeUserInfoBodyDto,
+    @Body() updateDto: ChangeUserInfoBodyDto,
   ): Promise<UserDto> {
     return this.usersService.changeUserInfo(userId, updateDto);
   }
@@ -63,7 +63,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Change users password' })
   @ApiResponse({
     status: 200,
-    type: UserDto,
+    type: UserPayloadDto,
   })
   @ApiResponse({
     status: 403,
@@ -71,7 +71,7 @@ export class UsersController {
   })
   public async changeUserPassword(
     @User('userId') userId: string,
-    @Param() changePasswordDto: ChangeUserPasswordBodyDto,
+    @Body() changePasswordDto: ChangeUserPasswordBodyDto,
   ): Promise<UserDto> {
     return this.usersService.changePassword(userId, changePasswordDto);
   }

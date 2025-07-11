@@ -28,16 +28,20 @@ export class UserModel extends Model<UserModel, UserCreationAttributes> {
   @Column
   declare userId: string;
 
+  @AllowNull(false)
   @Column
   declare fullname: string;
 
   @Unique
+  @AllowNull(false)
   @Column
   declare email: string;
 
+  @AllowNull(false)
   @Column
   declare password: string;
 
+  @AllowNull(false)
   @Default(UserRoles.USER)
   @Column({
     type: DataType.ENUM(...Object.values(UserRoles)),
@@ -62,6 +66,8 @@ export class UserModel extends Model<UserModel, UserCreationAttributes> {
   @Column
   declare updatedAt: Date;
 
+  @Default(null)
+  @AllowNull
   @DeletedAt
   @Column({ type: DataType.DATE })
   declare deletedAt: Date | null;

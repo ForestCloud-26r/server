@@ -5,7 +5,7 @@ const { DataType } = require('sequelize-typescript');
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.addColumn('users', 'mustChangePassword', {
-      type: DataType.STRING,
+      type: DataType.BOOLEAN,
       allowNull: true,
       defaultValue: false,
     });

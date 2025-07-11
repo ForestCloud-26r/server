@@ -33,14 +33,12 @@ export class AddNewUserBodyDto {
   role!: UserRoles;
 
   @IsBoolean()
-  @IsNotEmpty()
   @IsOptional()
   @ApiPropertyOptional({ example: false, default: true })
   hasAccess?: boolean;
 
   @IsBoolean()
-  @IsNotEmpty()
   @IsOptional()
-  @ApiPropertyOptional({ example: false, default: true })
+  @ApiPropertyOptional({ example: true, default: true })
   mustChangePassword?: boolean;
 }
