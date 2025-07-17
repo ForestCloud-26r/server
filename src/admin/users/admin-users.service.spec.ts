@@ -7,6 +7,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { UserRoles } from '@app/shared/enums';
 import { NotFoundException } from '@nestjs/common';
 import { AdminUserRepository } from './admin-user.repository';
+import { FileModel } from '../../database/models/file.model';
 
 describe('UsersService', () => {
   let service: AdminUsersService;
@@ -18,12 +19,12 @@ describe('UsersService', () => {
       imports: [
         SequelizeModule.forRoot({
           dialect: 'sqlite',
-          models: [UserModel],
+          models: [UserModel, FileModel],
           storage: ':memory:',
           autoLoadModels: true,
           sync: { force: true },
         }),
-        SequelizeModule.forFeature([UserModel]),
+        SequelizeModule.forFeature([UserModel, FileModel]),
       ],
       providers: [AdminUsersService, AdminUserRepository],
       exports: [SequelizeModule],

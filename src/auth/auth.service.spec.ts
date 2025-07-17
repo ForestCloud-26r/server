@@ -11,6 +11,7 @@ import type { SignupBodyDto } from './dto/signup-body.dto';
 import { UserRoles } from '@app/shared/enums';
 import { UnauthorizedException } from '@nestjs/common';
 import type { UserPayloadDto } from '@app/shared/dtos';
+import { FileModel } from '../database/models/file.model';
 
 describe('UsersService', () => {
   let authService: AuthService;
@@ -22,13 +23,13 @@ describe('UsersService', () => {
       imports: [
         SequelizeModule.forRoot({
           dialect: 'sqlite',
-          models: [UserModel],
+          models: [UserModel, FileModel],
           storage: ':memory:',
           autoLoadModels: true,
           sync: { force: true },
           logging: false,
         }),
-        SequelizeModule.forFeature([UserModel]),
+        SequelizeModule.forFeature([UserModel, FileModel]),
         JwtModule.register({
           secret: 'secret',
           signOptions: { expiresIn: '1m' },

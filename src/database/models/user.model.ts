@@ -5,6 +5,7 @@ import {
   DataType,
   Default,
   DeletedAt,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
@@ -12,6 +13,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript';
 import { UserRoles } from '@app/shared/enums';
+import { FileModel } from './file.model';
 
 export interface UserCreationAttributes {
   fullname: string;
@@ -57,6 +59,9 @@ export class UserModel extends Model<UserModel, UserCreationAttributes> {
   @Default(false)
   @Column
   declare mustChangePassword: boolean;
+
+  @HasMany(() => FileModel)
+  declare files: FileModel[];
 
   @CreatedAt
   @Column

@@ -11,6 +11,7 @@ import { ForbiddenException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import type { UserDto } from '@app/shared/dtos';
 import { afterEach } from 'node:test';
+import { FileModel } from '../database/models/file.model';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -22,13 +23,13 @@ describe('UsersService', () => {
       imports: [
         SequelizeModule.forRoot({
           dialect: 'sqlite',
-          models: [UserModel],
+          models: [UserModel, FileModel],
           storage: ':memory:',
           autoLoadModels: true,
           sync: { force: true },
           logging: false,
         }),
-        SequelizeModule.forFeature([UserModel]),
+        SequelizeModule.forFeature([UserModel, FileModel]),
       ],
       providers: [UsersService, UsersRepository],
     }).compile();
