@@ -35,11 +35,11 @@ export class OperationAccessGuard implements CanActivate {
     const targetUser = await this.adminUserRepository.findByPk(targetUserId);
 
     if (!targetUser) {
-      throw new NotFoundException();
+      throw new NotFoundException(`User not found by '${targetUserId}' id`);
     }
 
     if (user.role === UserRoles.ADMIN && targetUser.role !== UserRoles.USER) {
-      throw new ForbiddenException();
+      throw new ForbiddenException(`Can perform operation only on role 'user'`);
     }
 
     return true;

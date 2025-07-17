@@ -21,7 +21,7 @@ export class AdminUserRepository extends AbstractRepository<UserModel> {
     });
 
     if (!updatedUser) {
-      throw new NotFoundException();
+      throw new NotFoundException(`User not found by '${userId}' id`);
     }
 
     return updatedUser;
@@ -33,7 +33,7 @@ export class AdminUserRepository extends AbstractRepository<UserModel> {
     });
 
     if (!updatedUser) {
-      throw new NotFoundException();
+      throw new NotFoundException(`User not found by '${userId}' id`);
     }
 
     return updatedUser;
@@ -43,7 +43,7 @@ export class AdminUserRepository extends AbstractRepository<UserModel> {
     const deletedUser = await this.deleteByPk(userId);
 
     if (!deletedUser) {
-      throw new NotFoundException();
+      throw new NotFoundException(`User not found by '${userId}' id`);
     }
 
     return deletedUser;
@@ -55,7 +55,7 @@ export class AdminUserRepository extends AbstractRepository<UserModel> {
     });
 
     if (!updatedUser) {
-      throw new NotFoundException();
+      throw new NotFoundException(`User not found by '${userId}' id`);
     }
 
     return updatedUser;
