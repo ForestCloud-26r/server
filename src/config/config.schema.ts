@@ -9,4 +9,5 @@ export const configSchema = Joi.object<typeof EnvParams>({
   CLIENT_URL: Joi.string().uri().optional().default('http://localhost:7180'),
   JWT_SECRET: Joi.string().optional().default(uuidv7()),
   JWT_EXPIRES_IN: Joi.string().optional().default('30d'),
+  UPLOADS_DEST: Joi.string().optional().default('./uploads'),
 });

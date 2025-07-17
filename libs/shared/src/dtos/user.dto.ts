@@ -24,14 +24,6 @@ export class UserDto {
   hasAccess!: boolean;
 
   @Expose()
-  @ApiProperty({ example: '2025-07-03T14:28:11.981Z' })
-  createdAt!: Date;
-
-  @Expose()
-  @ApiProperty({ example: '2025-07-03T14:28:11.981Z' })
-  updatedAt!: Date;
-
-  @Expose()
   @ApiProperty({ example: '2025-07-03T14:28:11.981Z', nullable: true })
   deletedAt!: Date | null;
 }
