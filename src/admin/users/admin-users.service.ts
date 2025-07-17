@@ -56,7 +56,7 @@ export class AdminUsersService {
     const changedUser = await this.usersRepository.updateByPk(userId, bodyDto);
 
     if (!changedUser) {
-      throw new NotFoundException();
+      throw new NotFoundException(`User not found by '${userId}' id`);
     }
 
     return toUserDto(changedUser);
@@ -74,7 +74,7 @@ export class AdminUsersService {
     });
 
     if (!updatedUser) {
-      throw new NotFoundException();
+      throw new NotFoundException(`User not found by '${userId}' id`);
     }
 
     return toUserDto(updatedUser);
@@ -107,7 +107,7 @@ export class AdminUsersService {
     const user = await this.usersRepository.findByPk(userId);
 
     if (!user) {
-      throw new NotFoundException();
+      throw new NotFoundException(`User not found by '${userId}' id`);
     }
 
     return toUserDto(user);
