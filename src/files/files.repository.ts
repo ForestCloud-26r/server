@@ -2,7 +2,6 @@ import { AbstractRepository } from 'nest-sequelize-repository';
 import { FileModel } from '../database/models/file.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UserPayloadDto } from '@app/shared/dtos';
 import { extractFilename } from '@app/shared/utils';
 
 @Injectable()
@@ -18,10 +17,10 @@ export class FilesRepository extends AbstractRepository<FileModel> {
 
   public async saveFileMetadata(
     file: Express.Multer.File,
-    userDto: UserPayloadDto,
+    userId: string,
   ): Promise<FileModel> {
     return await this.create({
-      userId: userDto.userId,
+      userId,
       fileName: extractFilename(file.originalname),
       originalName: file.originalname,
       mimeType: file.mimetype,

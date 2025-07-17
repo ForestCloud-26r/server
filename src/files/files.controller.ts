@@ -16,7 +16,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FileDto, RejectResponseDto, UserPayloadDto } from '@app/shared/dtos';
+import { FileDto, RejectResponseDto } from '@app/shared/dtos';
 import { JwtGuard } from '@app/shared/guards';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileValidationInterceptor } from '@app/shared/interceptors';
@@ -52,9 +52,9 @@ export class FilesController {
   })
   public async uploadFile(
     @UploadedFile() file: Express.Multer.File,
-    @User() userDto: UserPayloadDto,
+    @User('userId') userId: string,
   ): Promise<FileDto> {
-    return this.filesService.uploadFile(file, userDto);
+    return this.filesService.uploadFile(file, userId);
   }
 
   @Get(':fileId')

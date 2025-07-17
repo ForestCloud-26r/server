@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
-import { FileDto, UserPayloadDto } from '@app/shared/dtos';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { FileDto } from '@app/shared/dtos';
 import { FilesRepository } from './files.repository';
 import { toFileDto } from '@app/shared/builders';
 import { ConfigService } from '@nestjs/config';
@@ -23,11 +18,11 @@ export class FilesService {
 
   public async uploadFile(
     file: Express.Multer.File,
-    userDto: UserPayloadDto,
+    userId: string,
   ): Promise<FileDto> {
     const fileMetadata = await this.filesRepository.saveFileMetadata(
       file,
-      userDto,
+      userId,
     );
 
     return toFileDto(fileMetadata);
@@ -51,11 +46,16 @@ export class FilesService {
       throw new BadRequestException('Unsafe path access');
     }
 
-    response.download(resolvedPath, file.fileName, (error: Error) => {
-      this.logger.error(`downloadFile: ${error}`);
-      throw new InternalServerErrorException();
-    });
+    return await new Promise<FileDto>((resolve, reject) => {
+      response.download(resolvedPath, file.fileName, (error: Error) => {
+        if (error) {
+          this.logger.error(`downloadFile: ${error}`);
+        }
+        response.status(500).end();
+        reject(error);
+      });
 
-    return toFileDto(file);
+      resolve(toFileDto(file));
+    });
   }
 }
