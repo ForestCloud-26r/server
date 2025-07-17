@@ -60,13 +60,13 @@ export class AuthService {
     const user = await this.usersService.getUserByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException('No user with such email found');
+      throw new UnauthorizedException('Credentials are incorrect');
     }
 
     const pwMatch = await bcrypt.compare(password, user.password);
 
     if (!pwMatch) {
-      throw new UnauthorizedException('Password is incorrect');
+      throw new UnauthorizedException('Credentials are incorrect');
     }
 
     return toUserDto(user);
