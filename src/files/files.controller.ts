@@ -11,6 +11,7 @@ import {
 import { FilesService } from './files.service';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiResponse,
@@ -23,6 +24,7 @@ import { FileValidationInterceptor } from '@app/shared/interceptors';
 import { User } from '@app/shared/decorators';
 import { DownloadFileParamsDto } from './dto/download-file-params.dto';
 import e from 'express';
+import { UploadFileBodyDto } from './dto/upload-file-body.dto';
 
 @ApiTags('Files')
 @ApiBearerAuth()
@@ -49,6 +51,9 @@ export class FilesController {
   @ApiResponse({
     status: 400,
     type: RejectResponseDto,
+  })
+  @ApiBody({
+    type: UploadFileBodyDto,
   })
   public async uploadFile(
     @UploadedFile() file: Express.Multer.File,
