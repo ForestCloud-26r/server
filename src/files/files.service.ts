@@ -4,7 +4,7 @@ import { FilesRepository } from './files.repository';
 import { toFileDto } from '@app/shared/builders';
 import { ConfigService } from '@nestjs/config';
 import { EnvParams } from '@app/shared/enums';
-import path from 'node:path';
+import * as path from 'path';
 import e from 'express';
 
 @Injectable()
@@ -47,15 +47,14 @@ export class FilesService {
     }
 
     return await new Promise<FileDto>((resolve, reject) => {
-      response.download(resolvedPath, file.fileName, (error: Error) => {
+      response.download(resolvedPath, file.originalName, (error: Error) => {
         if (error) {
           this.logger.error(`downloadFile: ${error}`);
+          response.status(500).end();
+          reject(error);
         }
-        response.status(500).end();
-        reject(error);
+        resolve(toFileDto(file));
       });
-
-      resolve(toFileDto(file));
     });
   }
 }

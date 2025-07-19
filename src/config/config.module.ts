@@ -10,5 +10,6 @@ import { configSchema } from './config.schema';
       validationSchema: configSchema,
     }),
   ],
+  exports: [ConfigModule],
 })
 export class ConfigModule {}

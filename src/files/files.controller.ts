@@ -62,7 +62,7 @@ export class FilesController {
     return this.filesService.uploadFile(file, userId);
   }
 
-  @Get(':fileId')
+  @Get('download/:fileId')
   @ApiOperation({ summary: 'Download file by id' })
   @ApiResponse({
     status: 200,

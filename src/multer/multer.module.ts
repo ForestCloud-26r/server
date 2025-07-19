@@ -20,5 +20,6 @@ import { MulterModule as PlatformExpressMulter } from '@nestjs/platform-express'
       inject: [ConfigService],
     }),
   ],
+  exports: [PlatformExpressMulter],
 })
 export class MulterModule {}

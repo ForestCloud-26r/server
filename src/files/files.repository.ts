@@ -2,7 +2,6 @@ import { AbstractRepository } from 'nest-sequelize-repository';
 import { FileModel } from '../database/models/file.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { extractFilename } from '@app/shared/utils';
 
 @Injectable()
 export class FilesRepository extends AbstractRepository<FileModel> {
@@ -21,7 +20,7 @@ export class FilesRepository extends AbstractRepository<FileModel> {
   ): Promise<FileModel> {
     return await this.create({
       userId,
-      fileName: extractFilename(file.originalname),
+      fileName: file.filename,
       originalName: file.originalname,
       mimeType: file.mimetype,
       size: file.size,
