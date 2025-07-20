@@ -78,4 +78,30 @@ export class DirectoriesService {
 
     return toFileDto(trashedDirectory);
   }
+
+  public async deleteDirectory(directoryId: string): Promise<FileDto> {
+    const deletedDirectory = await this.filesRepository.deleteByPk(
+      directoryId,
+      {
+        force: true,
+      },
+    );
+
+    if (!deletedDirectory) {
+      throw new NotFoundException(`Directory not found by ${directoryId} id`);
+    }
+
+    return toFileDto(deletedDirectory);
+  }
+
+  public async restoreDirectory(directoryId: string): Promise<FileDto> {
+    const restoredDirectory =
+      await this.filesRepository.restoreByPk(directoryId);
+
+    if (!restoredDirectory) {
+      throw new NotFoundException(`Directory not found by ${directoryId} id`);
+    }
+
+    return toFileDto(restoredDirectory);
+  }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -129,5 +130,53 @@ export class DirectoriesController {
     @Param() { directoryId }: GetDirectoryParamDto,
   ): Promise<FileDto> {
     return this.directoriesService.trashDirectory(directoryId);
+  }
+
+  @Put(':directoryId/restore')
+  @AccessPermission<GetDirectoryParamDto>('directoryId')
+  @UseGuards(AccessPermissionGuard)
+  @ApiOperation({
+    summary: 'Restore directory from trash',
+  })
+  @ApiResponse({
+    status: 403,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 200,
+    type: FileDto,
+  })
+  public async restoreDirectory(
+    @Param() { directoryId }: GetDirectoryParamDto,
+  ): Promise<FileDto> {
+    return this.directoriesService.restoreDirectory(directoryId);
+  }
+
+  @Delete(':directoryId')
+  @AccessPermission<GetDirectoryParamDto>('directoryId')
+  @UseGuards(AccessPermissionGuard)
+  @ApiOperation({
+    summary: 'Delete directory',
+  })
+  @ApiResponse({
+    status: 403,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 200,
+    type: FileDto,
+  })
+  public async deleteDirectory(
+    @Param() { directoryId }: GetDirectoryParamDto,
+  ): Promise<FileDto> {
+    return this.directoriesService.deleteDirectory(directoryId);
   }
 }
