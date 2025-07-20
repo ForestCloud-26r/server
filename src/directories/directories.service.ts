@@ -7,6 +7,7 @@ import { CreateDirectoryBodyDto } from './dto/create-directory-body.dto';
 import { FileDto } from '@app/shared/dtos';
 import { toFileDto } from '@app/shared/builders';
 import { FilesRepository } from '../files/files.repository';
+import { GetFilesResponseDto } from './dto/get-files-response.dto';
 
 @Injectable()
 export class DirectoriesService {
@@ -39,5 +40,19 @@ export class DirectoriesService {
     );
 
     return toFileDto(fileMetadata);
+  }
+
+  public async getFiles(
+    userId: string,
+    parentId?: string,
+  ): Promise<GetFilesResponseDto> {
+    const files = await this.filesRepository.findAll({
+      userId,
+      parentId: parentId ?? null,
+    });
+
+    const mappedFiles = files.map((file) => toFileDto(file));
+
+    return { files: mappedFiles };
   }
 }

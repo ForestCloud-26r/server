@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { DirectoriesService } from './directories.service';
 import {
   ApiBearerAuth,
@@ -6,11 +6,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FileDto, RejectResponseDto } from '@app/shared/dtos';
+import { FileDto, RejectResponseDto, UserPayloadDto } from '@app/shared/dtos';
 import { JwtGuard } from '@app/shared/guards';
 import { CreateDirectoryBodyDto } from './dto/create-directory-body.dto';
 import { SetParentQueryDto } from '../files/dto/set-parent-query.dto';
 import { User } from '@app/shared/decorators';
+import { GetFilesResponseDto } from './dto/get-files-response.dto';
 
 @ApiTags('Directories')
 @ApiBearerAuth()
@@ -45,5 +46,28 @@ export class DirectoriesController {
       userId,
       parentId,
     );
+  }
+
+  @Get('/files')
+  @ApiOperation({
+    summary: 'Get files in directory',
+  })
+  @ApiResponse({
+    status: 200,
+    type: GetFilesResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    type: RejectResponseDto,
+  })
+  public async getFiles(
+    @Query() { parentId }: SetParentQueryDto,
+    @User() { userId }: UserPayloadDto,
+  ): Promise<GetFilesResponseDto> {
+    return this.directoriesService.getFiles(userId, parentId);
   }
 }
