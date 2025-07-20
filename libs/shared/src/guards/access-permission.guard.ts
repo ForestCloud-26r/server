@@ -21,12 +21,21 @@ export class AccessPermissionGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
-    const accessToId = request.params[paramName];
+    const accessToId = request.params[paramName] ?? request.query[paramName];
 
-    const foundRecord = await this.filesRepository.findOne({
-      fileId: accessToId,
-      userId: user.userId,
-    });
+    if (!accessToId && paramName === 'parentId') {
+      return true;
+    }
+
+    const foundRecord = await this.filesRepository.findOne(
+      {
+        fileId: accessToId,
+        userId: user.userId,
+      },
+      {
+        paranoid: true,
+      },
+    );
 
     return Boolean(foundRecord);
   }

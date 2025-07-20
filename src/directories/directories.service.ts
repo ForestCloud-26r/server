@@ -8,7 +8,6 @@ import { FileDto } from '@app/shared/dtos';
 import { toFileDto } from '@app/shared/builders';
 import { FilesRepository } from '../files/files.repository';
 import { GetFilesResponseDto } from './dto/get-files-response.dto';
-import { createUniqueName } from '@app/shared/utils';
 
 @Injectable()
 export class DirectoriesService {

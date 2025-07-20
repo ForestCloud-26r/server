@@ -36,19 +36,6 @@ export class FilesService {
       return toFileDto(fileMetadata);
     }
 
-    const parentFile = await this.filesRepository.findOne({
-      fileId: parentId,
-      userId,
-    });
-
-    if (!parentFile) {
-      throw new NotFoundException('Parent directory not found');
-    }
-
-    if (parentFile.mimeType !== 'text/directory') {
-      throw new BadRequestException('Parent file is not a directory');
-    }
-
     return await this.filesRepository.transaction(async (transaction) => {
       const fileMetadata = await this.filesRepository.saveFileMetadata(
         file,
@@ -131,5 +118,37 @@ export class FilesService {
       accumulatedSize = newSize;
       currentParentId = parentFile.parentId;
     }
+  }
+
+  public async moveToTrash(fileId: string): Promise<FileDto> {
+    const trashedFile = await this.filesRepository.deleteByPk(fileId);
+
+    if (!trashedFile) {
+      throw new NotFoundException(`File not found by ${fileId} id`);
+    }
+
+    return toFileDto(trashedFile);
+  }
+
+  public async restoreFile(fileId: string): Promise<FileDto> {
+    const restoredFile = await this.filesRepository.restoreByPk(fileId);
+
+    if (!restoredFile) {
+      throw new NotFoundException(`File not found by ${fileId} id`);
+    }
+
+    return toFileDto(restoredFile);
+  }
+
+  public async deleteFile(fileId: string): Promise<FileDto> {
+    const deletedFile = await this.filesRepository.deleteByPk(fileId, {
+      force: true,
+    });
+
+    if (!deletedFile) {
+      throw new NotFoundException(`File not found by ${fileId} id`);
+    }
+
+    return toFileDto(deletedFile);
   }
 }
