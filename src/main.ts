@@ -7,6 +7,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EnvParams } from '@app/shared/enums';
+import { useContainer } from 'class-validator';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {
@@ -51,6 +52,11 @@ async function bootstrap(): Promise<void> {
       forbidNonWhitelisted: true,
     }),
   );
+
+  useContainer(app.select(AppModule), {
+    fallback: true,
+    fallbackOnErrors: true,
+  });
 
   await app.listen(PORT, HOST, () => {
     logger.log(`Service is running on http://${HOST}:${PORT}`);

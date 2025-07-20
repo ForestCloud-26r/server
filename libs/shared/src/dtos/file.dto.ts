@@ -11,6 +11,13 @@ export class FileDto {
   userId!: string;
 
   @Expose()
+  @ApiProperty({
+    example: '0197d0ae-ab4a-7bf3-a32e-4fe889c2e2db',
+    nullable: true,
+  })
+  parentId!: string | null;
+
+  @Expose()
   @ApiProperty({ example: 'my-text.txt' })
   fileName!: string;
 

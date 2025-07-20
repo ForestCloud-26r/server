@@ -7,6 +7,7 @@ import {
   Default,
   DeletedAt,
   ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
@@ -16,6 +17,7 @@ import { UserModel } from './user.model';
 
 export interface FileCreationAttributes {
   userId: string;
+  parentId: string | null;
   fileName: string;
   originalName: string;
   mimeType: string;
@@ -33,6 +35,12 @@ export class FileModel extends Model<FileModel, FileCreationAttributes> {
   @ForeignKey(() => UserModel)
   @Column
   declare userId: string;
+
+  @AllowNull
+  @Default(null)
+  @ForeignKey(() => FileModel)
+  @Column({ type: DataType.STRING })
+  declare parentId: string | null;
 
   @AllowNull(false)
   @Column
@@ -56,6 +64,12 @@ export class FileModel extends Model<FileModel, FileCreationAttributes> {
 
   @BelongsTo(() => UserModel)
   declare user: UserModel;
+
+  @BelongsTo(() => FileModel)
+  declare parent: FileModel;
+
+  @HasMany(() => FileModel)
+  declare children: FileModel[];
 
   @CreatedAt
   @Column

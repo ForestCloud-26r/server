@@ -3,11 +3,11 @@ import { UserDto } from '@app/shared/dtos';
 import { toUserDto } from '@app/shared/builders';
 import { AdminUserRepository } from './admin-user.repository';
 import { AddNewUserBodyDto } from './dto/add-new-user-body.dto';
-import { ChangeUserInfoBodyDto } from './dto/change-user-info-body.dto';
 import { DeleteUserResponseDto } from './dto/delete-user-response.dto';
 import { UserRoles } from '@app/shared/enums';
 import { GetAllUsersResponseDto } from './dto/get-all-users-response.dto';
 import { generateHash } from '@app/shared/utils';
+import { ChangeUserInfoBodyDto } from '../../users/dto/change-user-info-body.dto';
 
 @Injectable()
 export class AdminUsersService {

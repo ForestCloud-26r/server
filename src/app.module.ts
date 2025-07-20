@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { AdminUsersModule } from './admin/users/admin-users.module';
 import { FilesModule } from './files/files.module';
 import { MulterModule } from './multer/multer.module';
+import { DirectoriesModule } from './directories/directories.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MulterModule } from './multer/multer.module';
     AuthModule,
     FilesModule,
     MulterModule,
+    DirectoriesModule,
   ],
 })
 export class AppModule {}

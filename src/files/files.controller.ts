@@ -3,6 +3,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Res,
   UploadedFile,
   UseGuards,
@@ -25,6 +26,7 @@ import { User } from '@app/shared/decorators';
 import { DownloadFileParamsDto } from './dto/download-file-params.dto';
 import e from 'express';
 import { UploadFileBodyDto } from './dto/upload-file-body.dto';
+import { SetParentQueryDto } from './dto/set-parent-query.dto';
 
 @ApiTags('Files')
 @ApiBearerAuth()
@@ -56,10 +58,11 @@ export class FilesController {
     type: UploadFileBodyDto,
   })
   public async uploadFile(
+    @Query() { parentId }: SetParentQueryDto,
     @UploadedFile() file: Express.Multer.File,
     @User('userId') userId: string,
   ): Promise<FileDto> {
-    return this.filesService.uploadFile(file, userId);
+    return this.filesService.uploadFile(file, userId, parentId);
   }
 
   @Get('download/:fileId')
