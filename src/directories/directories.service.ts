@@ -8,6 +8,7 @@ import { FileDto } from '@app/shared/dtos';
 import { toFileDto } from '@app/shared/builders';
 import { FilesRepository } from '../files/files.repository';
 import { GetFilesResponseDto } from './dto/get-files-response.dto';
+import { createUniqueName } from '@app/shared/utils';
 
 @Injectable()
 export class DirectoriesService {
@@ -54,5 +55,27 @@ export class DirectoriesService {
     const mappedFiles = files.map((file) => toFileDto(file));
 
     return { files: mappedFiles };
+  }
+
+  public async renameDirectory(
+    directoryId: string,
+    dirname: string,
+  ): Promise<FileDto> {
+    const updatedDirectory = await this.filesRepository.renameDirectory(
+      dirname,
+      directoryId,
+    );
+
+    return toFileDto(updatedDirectory);
+  }
+
+  public async trashDirectory(directoryId: string): Promise<FileDto> {
+    const trashedDirectory = await this.filesRepository.deleteByPk(directoryId);
+
+    if (!trashedDirectory) {
+      throw new NotFoundException(`Directory not found by ${directoryId} id`);
+    }
+
+    return toFileDto(trashedDirectory);
   }
 }

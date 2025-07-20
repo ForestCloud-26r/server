@@ -1,17 +1,28 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { DirectoriesService } from './directories.service';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiProperty,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { FileDto, RejectResponseDto, UserPayloadDto } from '@app/shared/dtos';
-import { JwtGuard } from '@app/shared/guards';
+import { AccessPermissionGuard, JwtGuard } from '@app/shared/guards';
 import { CreateDirectoryBodyDto } from './dto/create-directory-body.dto';
 import { SetParentQueryDto } from '../files/dto/set-parent-query.dto';
-import { User } from '@app/shared/decorators';
+import { AccessPermission, User } from '@app/shared/decorators';
 import { GetFilesResponseDto } from './dto/get-files-response.dto';
+import { GetDirectoryParamDto } from './dto/get-directory-param.dto';
 
 @ApiTags('Directories')
 @ApiBearerAuth()
@@ -48,7 +59,7 @@ export class DirectoriesController {
     );
   }
 
-  @Get('/files')
+  @Get('content')
   @ApiOperation({
     summary: 'Get files in directory',
   })
@@ -69,5 +80,54 @@ export class DirectoriesController {
     @User() { userId }: UserPayloadDto,
   ): Promise<GetFilesResponseDto> {
     return this.directoriesService.getFiles(userId, parentId);
+  }
+
+  @Put(':directoryId/rename')
+  @AccessPermission<GetDirectoryParamDto>('directoryId')
+  @UseGuards(AccessPermissionGuard)
+  @ApiOperation({
+    summary: 'Rename directory',
+  })
+  @ApiResponse({
+    status: 400,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 200,
+    type: FileDto,
+  })
+  public async renameDirectory(
+    @Param() { directoryId }: GetDirectoryParamDto,
+    @Body() { dirname }: CreateDirectoryBodyDto,
+  ): Promise<FileDto> {
+    return this.directoriesService.renameDirectory(directoryId, dirname);
+  }
+
+  @Put(':directoryId/trash')
+  @AccessPermission<GetDirectoryParamDto>('directoryId')
+  @UseGuards(AccessPermissionGuard)
+  @ApiOperation({
+    summary: 'Move directory to trash',
+  })
+  @ApiResponse({
+    status: 403,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 200,
+    type: FileDto,
+  })
+  public async trashDirectory(
+    @Param() { directoryId }: GetDirectoryParamDto,
+  ): Promise<FileDto> {
+    return this.directoriesService.trashDirectory(directoryId);
   }
 }

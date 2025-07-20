@@ -70,4 +70,23 @@ export class FilesRepository extends AbstractRepository<FileModel> {
 
     return file;
   }
+
+  public async renameDirectory(
+    dirname: string,
+    directoryId: string,
+  ): Promise<FileModel> {
+    const uniqueName = createUniqueName(dirname);
+
+    const updatedDirectory = await this.updateByPk(directoryId, {
+      originalName: dirname,
+      fileName: uniqueName,
+      storagePath: `uploads/${uniqueName}`,
+    });
+
+    if (!updatedDirectory) {
+      throw new NotFoundException(`Directory not found by ${directoryId} id`);
+    }
+
+    return updatedDirectory;
+  }
 }
