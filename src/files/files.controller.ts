@@ -141,6 +141,8 @@ export class FilesController {
   }
 
   @Get('download/:fileId')
+  @AccessPermission<DownloadFileParamsDto>('fileId')
+  @UseGuards(AccessPermissionGuard)
   @ApiOperation({ summary: 'Download file by id' })
   @ApiResponse({
     status: 200,

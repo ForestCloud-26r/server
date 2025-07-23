@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { FilesRepository } from '../../../../src/files/files.repository';
 import { extractUserFromRequest } from '@app/shared/utils';
@@ -30,13 +35,18 @@ export class AccessPermissionGuard implements CanActivate {
     const foundRecord = await this.filesRepository.findOne(
       {
         fileId: accessToId,
-        userId: user.userId,
       },
       {
-        paranoid: true,
+        paranoid: false,
       },
     );
 
-    return Boolean(foundRecord);
+    if (!foundRecord) {
+      throw new NotFoundException(
+        `File or directory not found by ${accessToId} id`,
+      );
+    }
+
+    return Boolean(foundRecord.userId === user.userId);
   }
 }
