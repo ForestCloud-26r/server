@@ -21,11 +21,11 @@ import { JwtGuard, OperationAccessGuard, RoleGuard } from '@app/shared/guards';
 import { Roles } from '@app/shared/decorators';
 import { UserRoles } from '@app/shared/enums';
 import { AddNewUserBodyDto } from './dto/add-new-user-body.dto';
-import { ChangeUserInfoBodyDto } from './dto/change-user-info-body.dto';
-import { ChangeUserPasswordBodyDto } from './dto/change-user-password-body.dto';
+import { ResetUserPasswordBodyDto } from './dto/reset-user-password-body.dto';
 import { DeleteUserResponseDto } from './dto/delete-user-response.dto';
 import { ChangeUserRoleBody } from './dto/change-user-role-body';
 import { GetAllUsersResponseDto } from './dto/get-all-users-response.dto';
+import { ChangeUserInfoBodyDto } from '../../users/dto/change-user-info-body.dto';
 
 @ApiTags('Admin users')
 @ApiResponse({
@@ -191,7 +191,7 @@ export class AdminUsersController {
   })
   public async changeUserPassword(
     @Param() { userId }: GetUserByIdParamsDto,
-    @Body() { newPassword }: ChangeUserPasswordBodyDto,
+    @Body() { newPassword }: ResetUserPasswordBodyDto,
   ): Promise<UserDto> {
     return this.usersService.changeUserPassword(userId, newPassword);
   }

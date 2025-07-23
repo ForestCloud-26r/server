@@ -1,8 +1,11 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Put,
+  Query,
   Res,
   UploadedFile,
   UseGuards,
@@ -18,13 +21,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FileDto, RejectResponseDto } from '@app/shared/dtos';
-import { JwtGuard } from '@app/shared/guards';
+import { AccessPermissionGuard, JwtGuard } from '@app/shared/guards';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileValidationInterceptor } from '@app/shared/interceptors';
-import { User } from '@app/shared/decorators';
+import { AccessPermission, User } from '@app/shared/decorators';
 import { DownloadFileParamsDto } from './dto/download-file-params.dto';
 import e from 'express';
 import { UploadFileBodyDto } from './dto/upload-file-body.dto';
+import { SetParentQueryDto } from './dto/set-parent-query.dto';
+import { GetFileParamsDto } from './dto/get-file-params.dto';
 
 @ApiTags('Files')
 @ApiBearerAuth()
@@ -38,6 +43,8 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post('upload')
+  @AccessPermission<SetParentQueryDto>('parentId')
+  @UseGuards(AccessPermissionGuard)
   @UseInterceptors(
     FileInterceptor('file'),
     new FileValidationInterceptor('file'),
@@ -56,10 +63,81 @@ export class FilesController {
     type: UploadFileBodyDto,
   })
   public async uploadFile(
+    @Query() { parentId }: SetParentQueryDto,
     @UploadedFile() file: Express.Multer.File,
     @User('userId') userId: string,
   ): Promise<FileDto> {
-    return this.filesService.uploadFile(file, userId);
+    return this.filesService.uploadFile(file, userId, parentId);
+  }
+
+  @Put(':fileId/trash')
+  @AccessPermission<GetFileParamsDto>('fileId')
+  @UseGuards(AccessPermissionGuard)
+  @ApiOperation({
+    summary: 'Move file to trash',
+  })
+  @ApiResponse({
+    status: 200,
+    type: FileDto,
+  })
+  @ApiResponse({
+    status: 400,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    type: RejectResponseDto,
+  })
+  public async moveToTrash(
+    @Param() { fileId }: GetFileParamsDto,
+  ): Promise<FileDto> {
+    return this.filesService.moveToTrash(fileId);
+  }
+
+  @Put(':fileId/restore')
+  @AccessPermission<GetFileParamsDto>('fileId')
+  @UseGuards(AccessPermissionGuard)
+  @ApiOperation({
+    summary: 'Restore file from trash',
+  })
+  @ApiResponse({
+    status: 200,
+    type: FileDto,
+  })
+  @ApiResponse({
+    status: 400,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    type: RejectResponseDto,
+  })
+  public async restoreFromTrash(
+    @Param() { fileId }: GetFileParamsDto,
+  ): Promise<FileDto> {
+    return this.filesService.restoreFile(fileId);
+  }
+
+  @Delete(':fileId')
+  @AccessPermission<GetFileParamsDto>('fileId')
+  @UseGuards(AccessPermissionGuard)
+  @ApiOperation({
+    summary: 'Permanently delete file',
+  })
+  @ApiResponse({
+    status: 200,
+    type: FileDto,
+  })
+  @ApiResponse({
+    status: 400,
+    type: RejectResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    type: RejectResponseDto,
+  })
+  public async delete(@Param() { fileId }: GetFileParamsDto): Promise<FileDto> {
+    return this.filesService.deleteFile(fileId);
   }
 
   @Get('download/:fileId')
