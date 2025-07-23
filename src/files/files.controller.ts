@@ -43,6 +43,8 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post('upload')
+  @AccessPermission<SetParentQueryDto>('parentId')
+  @UseGuards(AccessPermissionGuard)
   @UseInterceptors(
     FileInterceptor('file'),
     new FileValidationInterceptor('file'),

@@ -27,15 +27,6 @@ export class FilesService {
     userId: string,
     parentId?: string,
   ): Promise<FileDto> {
-    if (!parentId) {
-      const fileMetadata = await this.filesRepository.saveFileMetadata(
-        file,
-        userId,
-      );
-
-      return toFileDto(fileMetadata);
-    }
-
     return await this.filesRepository.transaction(async (transaction) => {
       const fileMetadata = await this.filesRepository.saveFileMetadata(
         file,
@@ -44,11 +35,13 @@ export class FilesService {
         transaction,
       );
 
-      await this.resizeParentDirectory(
-        parentId,
-        fileMetadata.size,
-        transaction,
-      );
+      if (parentId) {
+        await this.resizeParentDirectory(
+          parentId,
+          fileMetadata.size,
+          transaction,
+        );
+      }
 
       return toFileDto(fileMetadata);
     });
