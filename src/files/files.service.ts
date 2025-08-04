@@ -12,6 +12,7 @@ import { EnvParams } from '@app/shared/enums';
 import * as path from 'path';
 import e from 'express';
 import { Transaction } from 'sequelize';
+import { UploadFilesResponseDto } from './dto/upload-files-response.dto';
 
 @Injectable()
 export class FilesService {
@@ -22,28 +23,32 @@ export class FilesService {
     private readonly config: ConfigService,
   ) {}
 
-  public async uploadFile(
-    file: Express.Multer.File,
+  public async uploadFiles(
+    files: Express.Multer.File[],
     userId: string,
     parentId?: string,
-  ): Promise<FileDto> {
+  ): Promise<UploadFilesResponseDto> {
     return await this.filesRepository.transaction(async (transaction) => {
-      const fileMetadata = await this.filesRepository.saveFileMetadata(
-        file,
-        userId,
-        parentId,
-        transaction,
-      );
+      const fileDtos: FileDto[] = [];
+      let totalSize = 0;
 
-      if (parentId) {
-        await this.resizeParentDirectory(
+      for (const file of files) {
+        const fileMetadata = await this.filesRepository.saveFileMetadata(
+          file,
+          userId,
           parentId,
-          fileMetadata.size,
           transaction,
         );
+
+        totalSize += fileMetadata.size;
+        fileDtos.push(toFileDto(fileMetadata));
       }
 
-      return toFileDto(fileMetadata);
+      if (parentId) {
+        await this.resizeParentDirectory(parentId, totalSize, transaction);
+      }
+
+      return { files: fileDtos };
     });
   }
 

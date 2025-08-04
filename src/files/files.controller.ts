@@ -7,7 +7,7 @@ import {
   Put,
   Query,
   Res,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -22,14 +22,15 @@ import {
 } from '@nestjs/swagger';
 import { FileDto, RejectResponseDto } from '@app/shared/dtos';
 import { AccessPermissionGuard, JwtGuard } from '@app/shared/guards';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { FileValidationInterceptor } from '@app/shared/interceptors';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { FilesValidationInterceptor } from '@app/shared/interceptors';
 import { AccessPermission, User } from '@app/shared/decorators';
 import { DownloadFileParamsDto } from './dto/download-file-params.dto';
 import e from 'express';
-import { UploadFileBodyDto } from './dto/upload-file-body.dto';
+import { UploadFilesBodyDto } from './dto/upload-file-body.dto';
 import { SetParentQueryDto } from './dto/set-parent-query.dto';
 import { GetFileParamsDto } from './dto/get-file-params.dto';
+import { UploadFilesResponseDto } from './dto/upload-files-response.dto';
 
 @ApiTags('Files')
 @ApiBearerAuth()
@@ -46,28 +47,28 @@ export class FilesController {
   @AccessPermission<SetParentQueryDto>('parentId')
   @UseGuards(AccessPermissionGuard)
   @UseInterceptors(
-    FileInterceptor('file'),
-    new FileValidationInterceptor('file'),
+    FilesInterceptor('files'),
+    new FilesValidationInterceptor('files'),
   )
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload file to the server' })
+  @ApiOperation({ summary: 'Upload files to the server' })
   @ApiResponse({
     status: 200,
-    type: FileDto,
+    type: UploadFilesResponseDto,
   })
   @ApiResponse({
     status: 400,
     type: RejectResponseDto,
   })
   @ApiBody({
-    type: UploadFileBodyDto,
+    type: UploadFilesBodyDto,
   })
   public async uploadFile(
     @Query() { parentId }: SetParentQueryDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
     @User('userId') userId: string,
-  ): Promise<FileDto> {
-    return this.filesService.uploadFile(file, userId, parentId);
+  ): Promise<UploadFilesResponseDto> {
+    return this.filesService.uploadFiles(files, userId, parentId);
   }
 
   @Put(':fileId/trash')
