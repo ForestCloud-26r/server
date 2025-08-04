@@ -30,6 +30,7 @@ import e from 'express';
 import { UploadFilesBodyDto } from './dto/upload-file-body.dto';
 import { SetParentQueryDto } from './dto/set-parent-query.dto';
 import { GetFileParamsDto } from './dto/get-file-params.dto';
+import { UploadFilesResponseDto } from './dto/upload-files-response.dto';
 
 @ApiTags('Files')
 @ApiBearerAuth()
@@ -50,10 +51,10 @@ export class FilesController {
     new FilesValidationInterceptor('files'),
   )
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload file to the server' })
+  @ApiOperation({ summary: 'Upload files to the server' })
   @ApiResponse({
     status: 200,
-    type: FileDto,
+    type: UploadFilesResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -66,7 +67,7 @@ export class FilesController {
     @Query() { parentId }: SetParentQueryDto,
     @UploadedFiles() files: Express.Multer.File[],
     @User('userId') userId: string,
-  ): Promise<FileDto> {
+  ): Promise<UploadFilesResponseDto> {
     return this.filesService.uploadFiles(files, userId, parentId);
   }
 

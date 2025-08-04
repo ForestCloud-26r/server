@@ -5,7 +5,7 @@ export class UploadFilesBodyDto {
   @IsNotEmpty()
   @IsArray()
   @ApiProperty({
-    description: 'file',
+    description: 'files',
   })
   files!: Express.Multer.File[];
 }
