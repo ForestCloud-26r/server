@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDirectoryBodyDto } from './dto/create-directory-body.dto';
 import { FileDto } from '@app/shared/dtos';
 import { toFileDto } from '@app/shared/builders';

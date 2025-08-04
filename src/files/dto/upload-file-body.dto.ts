@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UploadFileBodyDto {
-  @IsString()
+export class UploadFilesBodyDto {
   @IsNotEmpty()
+  @IsArray()
   @ApiProperty({
     description: 'file',
   })
-  file!: Express.Multer.File;
+  files!: Express.Multer.File[];
 }
