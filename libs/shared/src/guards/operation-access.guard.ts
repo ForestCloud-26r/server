@@ -28,6 +28,11 @@ export class OperationAccessGuard implements CanActivate {
       return true;
     }
 
+    // Check if user has access - this provides defense-in-depth
+    if (!user.hasAccess) {
+      throw new ForbiddenException('User does not have access');
+    }
+
     if (!targetUserId) {
       throw new BadRequestException(`'userId' route parameter is required`);
     }
