@@ -17,7 +17,11 @@ import {
 } from '@nestjs/swagger';
 import { RejectResponseDto, UserDto } from '@app/shared/dtos';
 import { GetUserByIdParamsDto } from './dto/get-user-by-id-params.dto';
-import { JwtGuard, OperationAccessGuard, RoleGuard } from '@app/shared/guards';
+import {
+  JwtGuard,
+  OperateOnUserPermissionGuard,
+  RoleGuard,
+} from '@app/shared/guards';
 import { Roles } from '@app/shared/decorators';
 import { UserRoles } from '@app/shared/enums';
 import { AddNewUserBodyDto } from './dto/add-new-user-body.dto';
@@ -94,7 +98,7 @@ export class AdminUsersController {
   }
 
   @Put(':userId/restrict-access')
-  @UseGuards(OperationAccessGuard)
+  @UseGuards(OperateOnUserPermissionGuard)
   @ApiOperation({ summary: 'Restrict access to user' })
   @ApiResponse({
     status: 200,
@@ -131,7 +135,7 @@ export class AdminUsersController {
   }
 
   @Put(':userId')
-  @UseGuards(OperationAccessGuard)
+  @UseGuards(OperateOnUserPermissionGuard)
   @ApiOperation({ summary: 'Change user info' })
   @ApiResponse({
     status: 200,
@@ -175,7 +179,7 @@ export class AdminUsersController {
   }
 
   @Put(':userId/password')
-  @UseGuards(OperationAccessGuard)
+  @UseGuards(OperateOnUserPermissionGuard)
   @ApiOperation({ summary: 'Recover user password' })
   @ApiResponse({
     status: 200,
@@ -197,7 +201,7 @@ export class AdminUsersController {
   }
 
   @Delete(':userId')
-  @UseGuards(OperationAccessGuard)
+  @UseGuards(OperateOnUserPermissionGuard)
   @ApiOperation({ summary: 'Delete user' })
   @ApiResponse({
     status: 200,
