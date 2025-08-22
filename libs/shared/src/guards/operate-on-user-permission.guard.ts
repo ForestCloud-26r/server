@@ -13,7 +13,7 @@ import { AdminUserRepository } from '../../../../src/admin/users/admin-user.repo
 import { UserRoles } from '@app/shared/enums';
 
 @Injectable()
-export class OperationAccessGuard implements CanActivate {
+export class OperateOnUserPermissionGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly adminUserRepository: AdminUserRepository,
@@ -28,6 +28,10 @@ export class OperationAccessGuard implements CanActivate {
       return true;
     }
 
+    if (user.role !== UserRoles.ADMIN) {
+      return false;
+    }
+
     if (!targetUserId) {
       throw new BadRequestException(`'userId' route parameter is required`);
     }
@@ -38,7 +42,7 @@ export class OperationAccessGuard implements CanActivate {
       throw new NotFoundException(`User not found by '${targetUserId}' id`);
     }
 
-    if (user.role === UserRoles.ADMIN && targetUser.role !== UserRoles.USER) {
+    if (targetUser.role !== UserRoles.USER) {
       throw new ForbiddenException(`Can perform operation only on role 'user'`);
     }
 
