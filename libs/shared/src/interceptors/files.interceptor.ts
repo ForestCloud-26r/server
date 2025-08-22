@@ -20,10 +20,8 @@ export class FilesValidationInterceptor implements NestInterceptor {
     const request: e.Request = context.switchToHttp().getRequest();
 
     const { files } = request;
-    const fileInArray = files?.[this.key] as Express.Multer.File[];
-    const [file] = fileInArray || [];
 
-    if (!file) {
+    if (!files?.length) {
       throw new BadRequestException('No files provided');
     }
 

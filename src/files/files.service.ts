@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import * as path from 'path';
 import e from 'express';
 import { Transaction } from 'sequelize';
 import { UploadFilesResponseDto } from './dto/upload-files-response.dto';
+import * as fs from 'node:fs/promises';
 
 @Injectable()
 export class FilesService {
@@ -59,12 +61,7 @@ export class FilesService {
   ): Promise<FileDto> {
     const file = await this.filesRepository.getUserFileById(fileId, userId);
 
-    const uploadsDestination = this.config.getOrThrow<string>(
-      EnvParams.UPLOADS_DEST,
-    );
-    const baseDir = path.resolve(uploadsDestination);
-
-    const resolvedPath = path.resolve(file.storagePath);
+    const { resolvedPath, baseDir } = this.resolveAndCheckPath(file);
 
     if (!resolvedPath.startsWith(baseDir)) {
       throw new BadRequestException('Unsafe path access');
@@ -139,14 +136,45 @@ export class FilesService {
   }
 
   public async deleteFile(fileId: string): Promise<FileDto> {
+    const fileToDelete = await this.filesRepository.findByPk(fileId, {
+      paranoid: false,
+    });
+
+    if (!fileToDelete) {
+      throw new NotFoundException(`File not found by ${fileId} id`);
+    }
+
+    try {
+      const { resolvedPath } = this.resolveAndCheckPath(fileToDelete);
+
+      await fs.rm(resolvedPath);
+    } catch (error: any) {
+      this.logger.log(`rm: ${error}`);
+      throw new InternalServerErrorException();
+    }
+
     const deletedFile = await this.filesRepository.deleteByPk(fileId, {
       force: true,
     });
 
-    if (!deletedFile) {
-      throw new NotFoundException(`File not found by ${fileId} id`);
+    return toFileDto(deletedFile!);
+  }
+
+  private resolveAndCheckPath(file: FileDto): {
+    resolvedPath: string;
+    baseDir: string;
+  } {
+    const uploadsDestination = this.config.getOrThrow<string>(
+      EnvParams.UPLOADS_DEST,
+    );
+    const baseDir = path.resolve(uploadsDestination);
+
+    const resolvedPath = path.resolve(file.storagePath);
+
+    if (!resolvedPath.startsWith(baseDir)) {
+      throw new BadRequestException('Unsafe path access');
     }
 
-    return toFileDto(deletedFile);
+    return { resolvedPath, baseDir };
   }
 }
