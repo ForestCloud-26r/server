@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "0.0.1",
+  "version": "1.0.0-alpha.v0.01",
   "description": "Forest cloud storage backend server",
   "author": "Kiril Yakymchuk <stbestich@gmail.com>",
   "private": true,
