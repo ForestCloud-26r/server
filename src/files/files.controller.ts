@@ -31,6 +31,7 @@ import { UploadFilesBodyDto } from './dto/upload-file-body.dto';
 import { SetParentQueryDto } from './dto/set-parent-query.dto';
 import { GetFileParamsDto } from './dto/get-file-params.dto';
 import { UploadFilesResponseDto } from './dto/upload-files-response.dto';
+import { RollbackUploadInterceptor } from '@app/shared/interceptors/rollback-upload.interceptor';
 
 @ApiTags('Files')
 @ApiBearerAuth()
@@ -44,11 +45,10 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post('upload')
-  @AccessPermission<SetParentQueryDto>('parentId')
-  @UseGuards(AccessPermissionGuard)
   @UseInterceptors(
     FilesInterceptor('files'),
     new FilesValidationInterceptor('files'),
+    RollbackUploadInterceptor,
   )
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload files to the server' })

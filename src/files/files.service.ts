@@ -30,6 +30,8 @@ export class FilesService {
     userId: string,
     parentId?: string,
   ): Promise<UploadFilesResponseDto> {
+    //* TODO need to be refactored with insertMany
+
     return await this.filesRepository.transaction(async (transaction) => {
       const fileDtos: FileDto[] = [];
       let totalSize = 0;
@@ -147,7 +149,7 @@ export class FilesService {
     try {
       const { resolvedPath } = this.resolveAndCheckPath(fileToDelete);
 
-      await fs.rm(resolvedPath);
+      await fs.unlink(resolvedPath);
     } catch (error: any) {
       this.logger.log(`rm: ${error}`);
       throw new InternalServerErrorException();
