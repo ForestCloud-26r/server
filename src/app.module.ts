@@ -1,10 +1,25 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { DatabaseModule } from './database/database.module';
+import { ConfigModule } from './config/config.module';
+import { LoggerModule } from './logger/logger.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { AdminUsersModule } from './admin/users/admin-users.module';
+import { FilesModule } from './files/files.module';
+import { MulterModule } from './multer/multer.module';
+import { DirectoriesModule } from './directories/directories.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    DatabaseModule,
+    ConfigModule,
+    LoggerModule,
+    AdminUsersModule,
+    UsersModule,
+    AuthModule,
+    FilesModule,
+    MulterModule,
+    DirectoriesModule,
+  ],
 })
 export class AppModule {}
