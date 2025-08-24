@@ -36,8 +36,6 @@ export class DirectoriesController {
   constructor(private readonly directoriesService: DirectoriesService) {}
 
   @Post()
-  @AccessPermission<SetParentQueryDto>('parentId')
-  @UseGuards(AccessPermissionGuard)
   @ApiOperation({
     summary: 'Create directory',
   })
@@ -62,8 +60,6 @@ export class DirectoriesController {
   }
 
   @Get('content')
-  @AccessPermission<SetParentQueryDto>('parentId')
-  @UseGuards(AccessPermissionGuard)
   @ApiOperation({
     summary: 'Get files in directory',
   })

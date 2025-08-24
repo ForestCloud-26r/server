@@ -26,9 +26,9 @@ export class AccessPermissionGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
-    const accessToId = request.params[paramName] ?? request.query[paramName];
+    const accessToId = request.params[paramName];
 
-    if (!accessToId && paramName === 'parentId') {
+    if (!accessToId) {
       return true;
     }
 
