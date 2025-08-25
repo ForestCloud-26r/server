@@ -1,11 +1,7 @@
 import { AbstractRepository } from 'nest-sequelize-repository';
 import { FileModel } from '../database/models/file.model';
 import { InjectModel } from '@nestjs/sequelize';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { createUniqueName } from '@app/shared/utils';
 import { MimeTypes } from '@app/shared/enums';
 import { Transaction } from 'sequelize';
@@ -70,10 +66,6 @@ export class FilesRepository extends AbstractRepository<FileModel> {
 
     if (!file) {
       throw new NotFoundException(`File not found by ${fileId} id`);
-    }
-
-    if (file.mimeType === 'text/directory') {
-      throw new BadRequestException(`Cannot download directory`);
     }
 
     return file;

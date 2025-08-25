@@ -23,7 +23,10 @@ import {
 import { FileDto, RejectResponseDto } from '@app/shared/dtos';
 import { AccessPermissionGuard, JwtGuard } from '@app/shared/guards';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { FilesValidationInterceptor } from '@app/shared/interceptors';
+import {
+  FilesValidationInterceptor,
+  RollbackUploadInterceptor,
+} from '@app/shared/interceptors';
 import { AccessPermission, User } from '@app/shared/decorators';
 import { DownloadFileParamsDto } from './dto/download-file-params.dto';
 import e from 'express';
@@ -31,7 +34,6 @@ import { UploadFilesBodyDto } from './dto/upload-file-body.dto';
 import { SetParentQueryDto } from './dto/set-parent-query.dto';
 import { GetFileParamsDto } from './dto/get-file-params.dto';
 import { UploadFilesResponseDto } from './dto/upload-files-response.dto';
-import { RollbackUploadInterceptor } from '@app/shared/interceptors/rollback-upload.interceptor';
 
 @ApiTags('Files')
 @ApiBearerAuth()
@@ -162,6 +164,6 @@ export class FilesController {
     @User('userId') userId: string,
     @Res() response: e.Response,
   ): Promise<FileDto> {
-    return this.filesService.downloadFile(fileId, userId, response);
+    return this.filesService.download(fileId, userId, response);
   }
 }

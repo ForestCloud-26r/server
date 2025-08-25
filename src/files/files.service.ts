@@ -15,6 +15,8 @@ import e from 'express';
 import { Transaction } from 'sequelize';
 import { UploadFilesResponseDto } from './dto/upload-files-response.dto';
 import * as fs from 'node:fs/promises';
+import { FileModel } from '../database/models/file.model';
+import * as archiver from 'archiver';
 
 @Injectable()
 export class FilesService {
@@ -56,13 +58,24 @@ export class FilesService {
     });
   }
 
-  public async downloadFile(
+  public async download(
     fileId: string,
     userId: string,
     response: e.Response,
   ): Promise<FileDto> {
     const file = await this.filesRepository.getUserFileById(fileId, userId);
 
+    if (file.mimeType === 'text/directory') {
+      return this.downloadDirectory(file, userId, response);
+    }
+
+    return this.downloadFile(file, response);
+  }
+
+  private async downloadFile(
+    file: FileModel,
+    response: e.Response,
+  ): Promise<FileDto> {
     const { resolvedPath, baseDir } = this.resolveAndCheckPath(file);
 
     if (!resolvedPath.startsWith(baseDir)) {
@@ -79,6 +92,84 @@ export class FilesService {
         resolve(toFileDto(file));
       });
     });
+  }
+
+  private async downloadDirectory(
+    directory: FileModel,
+    userId: string,
+    response: e.Response,
+  ): Promise<FileDto> {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises,no-async-promise-executor
+    return new Promise<FileDto>(async (resolve, reject) => {
+      response.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${directory.originalName || directory.fileName}.zip"`,
+      );
+      response.setHeader('Content-Type', 'application/zip');
+
+      const archive = archiver('zip', { zlib: { level: 9 } });
+
+      archive.on('error', (error: Error) => {
+        this.logger.error(`archive: ${error}`);
+        response.status(500).end();
+        reject(error);
+      });
+
+      archive.on('finish', () => {
+        resolve(toFileDto(directory));
+      });
+
+      archive.pipe(response);
+
+      try {
+        await this.addDirectoryContentsToArchive({
+          archive,
+          directory,
+          userId,
+        });
+
+        await archive.finalize();
+      } catch (error: any) {
+        this.logger.log(`downloadDirectory: ${error}`);
+        reject(error as Error);
+      }
+    });
+  }
+
+  private async addDirectoryContentsToArchive({
+    archive,
+    directory,
+    userId,
+    basePath = '',
+  }: {
+    archive: archiver.Archiver;
+    directory: FileModel;
+    userId: string;
+    basePath?: string;
+  }): Promise<void> {
+    const children = await this.filesRepository.findAll({
+      parentId: directory.fileId,
+      userId,
+    });
+
+    for (const child of children) {
+      const relativePath = path.join(basePath, child.originalName);
+
+      if (child.mimeType === 'text/directory') {
+        archive.append('', { name: relativePath + '/' });
+
+        await this.addDirectoryContentsToArchive({
+          archive,
+          userId,
+          basePath: relativePath,
+          directory: child,
+        });
+      } else {
+        const { resolvedPath } = this.resolveAndCheckPath(child);
+
+        archive.file(resolvedPath, { name: relativePath });
+      }
+    }
   }
 
   private async resizeParentDirectory(
