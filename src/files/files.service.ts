@@ -122,7 +122,7 @@ export class FilesService {
       this.addDirectoryContentsToArchive({ archive, directory, userId })
         .then(() => archive.finalize())
         .catch((error: Error) => {
-          this.logger.log(`downloadDirectory: ${error}`);
+          this.logger.error(`downloadDirectory: ${error}`);
           response.status(500).end();
           reject(error);
         });
