@@ -108,7 +108,7 @@ export class FilesService {
     const archive = archiver('zip', { zlib: { level: 9 } });
     archive.pipe(response);
 
-    return await new Promise<FileDto>((resolve, reject) => {
+    return new Promise<FileDto>((resolve, reject) => {
       archive.on('error', (error: Error) => {
         this.logger.error(`archive: ${error}`);
         response.status(500).end();
