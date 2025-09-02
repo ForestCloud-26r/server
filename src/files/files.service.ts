@@ -99,16 +99,16 @@ export class FilesService {
     userId: string,
     response: e.Response,
   ): Promise<FileDto> {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises,no-async-promise-executor
-    return new Promise<FileDto>(async (resolve, reject) => {
-      response.setHeader(
-        'Content-Disposition',
-        `attachment; filename="${directory.originalName || directory.fileName}.zip"`,
-      );
-      response.setHeader('Content-Type', 'application/zip');
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${directory.originalName || directory.fileName}.zip"`,
+    );
+    response.setHeader('Content-Type', 'application/zip');
 
-      const archive = archiver('zip', { zlib: { level: 9 } });
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.pipe(response);
 
+    return await new Promise<FileDto>((resolve, reject) => {
       archive.on('error', (error: Error) => {
         this.logger.error(`archive: ${error}`);
         response.status(500).end();
@@ -119,20 +119,13 @@ export class FilesService {
         resolve(toFileDto(directory));
       });
 
-      archive.pipe(response);
-
-      try {
-        await this.addDirectoryContentsToArchive({
-          archive,
-          directory,
-          userId,
+      this.addDirectoryContentsToArchive({ archive, directory, userId })
+        .then(() => archive.finalize())
+        .catch((error: Error) => {
+          this.logger.log(`downloadDirectory: ${error}`);
+          response.status(500).end();
+          reject(error);
         });
-
-        await archive.finalize();
-      } catch (error: any) {
-        this.logger.log(`downloadDirectory: ${error}`);
-        reject(error as Error);
-      }
     });
   }
 
