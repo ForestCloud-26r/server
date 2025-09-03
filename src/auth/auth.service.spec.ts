@@ -131,6 +131,7 @@ describe('UsersService', () => {
         email: 'valid@user.com',
         password: plainPw,
         role: UserRoles.ADMIN,
+        hasAccess: true,
       });
 
       const result = await authService.validateUser(user.email, plainPw);

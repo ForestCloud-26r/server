@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SignupBodyDto } from './dto/signup-body.dto';
 import { SignupResponseDto } from './dto/signup-response.dto';
 import { UsersService } from '../users/users.service';
@@ -23,6 +27,10 @@ export class AuthService {
     const createUserDto: CreateUserDto = {
       ...signupDto,
     };
+
+    if (users.find((user) => user.email === signupDto.email)) {
+      throw new ForbiddenException('Please, try other email');
+    }
 
     if (!users.length) {
       createUserDto.role = UserRoles.OWNER;
